@@ -21,8 +21,10 @@ const contractSchema = new Schema(
     }
 )
 
-contractSchema.virtual('id').get(function() {
-    return this._id
+contractSchema.set('toObject', {
+    virtuals: true,
+    versionKey: false,
+    transform: function(doc, ret) { delete ret._id }
 })
 
 const Contract = mongoose.model('Contract', contractSchema)

@@ -34,8 +34,10 @@ const paymentSchema = new Schema(
     }
 )
 
-paymentSchema.virtual('id').get(function() {
-    return this._id
+paymentSchema.set('toObject', {
+    virtuals: true,
+    versionKey: false,
+    transform: function(doc, ret) { delete ret._id }
 })
 
 const Payment = mongoose.model('Payment', paymentSchema)
