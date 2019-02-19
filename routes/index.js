@@ -3,9 +3,9 @@ const errorHandler = require('../middleware/errorHandler')
 
 function init(app) {
 
-    app.all('*', applicationController.handleResourceNotFound);
+    app.all('*', applicationController.handleResourceNotFound)
 
-    app.use(errorHandler);
+    app.use(errorHandler)
 
 }
 

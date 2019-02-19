@@ -1,8 +1,8 @@
 class ApplicationError extends Error {
     constructor(message) {
-        super(message);
-        this.name = this.constructor.name;
+        super(message)
+        this.name = this.constructor.name
     }
 }
 
-module.exports = ApplicationError;
+module.exports = ApplicationError
