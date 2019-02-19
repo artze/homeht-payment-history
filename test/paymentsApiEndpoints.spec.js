@@ -1,7 +1,7 @@
 const expect = require('chai').expect
 const request = require('request')
 const domainUrl = require('./config').domainUrl
-const paymentApiUrl = `${domainUrl}/payments`
+const paymentApiUrl = `${domainUrl}/contracts/2/payments`
 
 describe('Test payments API endpoint are routed correctly', function() {
     describe('Calling GET to /payments', function() {
