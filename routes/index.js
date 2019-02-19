@@ -4,7 +4,7 @@ const errorHandler = require('../middleware/errorHandler')
 
 function init(app) {
 
-    app.use('/payments', paymentsApiRoutes)
+    app.use('/', paymentsApiRoutes)
 
     app.all('*', applicationController.handleResourceNotFound)
 
