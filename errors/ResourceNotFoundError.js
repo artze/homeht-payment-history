@@ -1,9 +1,9 @@
-const ApplicationError = require('./ApplicationError');
+const ApplicationError = require('./ApplicationError')
 
 class ResourceNotFoundError extends ApplicationError {
     constructor(message) {
-        super(message);
+        super(message)
     }
 }
 
-module.exports = ResourceNotFoundError;
+module.exports = ResourceNotFoundError
