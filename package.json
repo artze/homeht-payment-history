@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "NODE_ENV=development nodemon ./bin/www",
     "test": "NODE_ENV=test mocha --recursive",
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "seed": "node db/seed.js"
   },
   "dependencies": {
     "dotenv": "^6.2.0",
