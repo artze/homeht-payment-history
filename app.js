@@ -1,15 +1,16 @@
-const express = require('express');
-const logger = require('morgan');
-const app = express();
-const routes = require('./routes');
-const db = require('./db');
+require('dotenv').config()
+const express = require('express')
+const logger = require('morgan')
+const app = express()
+const routes = require('./routes')
+const db = require('./db')
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(logger('dev'))
+app.use(express.json())
+app.use(express.urlencoded({ extended: false }))
 
-db.init();
+db.init()
 
-routes.init(app);
+routes.init(app)
 
-module.exports = app;
+module.exports = app
