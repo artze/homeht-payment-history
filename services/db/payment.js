@@ -17,6 +17,13 @@ const Payment = require('../../db/models/Payment')
  * @property {number} [value]
  * @property {Object} [time]
  * @property {boolean} [isImported]
+ * 
+ * Filter object type for querying payments
+ * @typedef PaymentFilterObject
+ * @type {Object}
+ * @property {string} contractId
+ * @property {string} startDate
+ * @property {string} endDate
  */
 
 /**
@@ -73,8 +80,33 @@ function updatePayment(paymentId, updatedPayment) {
     })
 }
 
+/**
+ * Fetches payment entities from database that fulfils contractId, startDate, endDate
+ * @param {PaymentFilterObject} filter - Determines payment fetching conditions
+ * @returns {Promise}
+ */
+function getPaymentsWithFilter(filter) {
+    const conditions = {
+        contractId: filter.contractId,
+        time: {
+            $gte: new Date(filter.startDate),
+            $lte: new Date(filter.endDate)
+        }
+    }
+    return new Promise(function(resolve, reject) {
+        Payment.find(conditions)
+            .then(function(fetchedPayments) {
+                resolve(fetchedPayments)
+            })
+            .catch(function(err) {
+                reject(err)
+            })
+    })
+}
+
 module.exports = {
     createPayment,
     deletePayment,
-    updatePayment
+    updatePayment,
+    getPaymentsWithFilter
 }

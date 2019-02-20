@@ -13,13 +13,13 @@ describe('Test payment db service', function() {
 
     describe('Create payment', function() {
         it('Should create payment entity in db', async function() {
-            await paymentDbService.createPayment(paymentData)
+            await paymentDbService.createPayment(paymentData.single)
 
             let retrievedPayment = await Payment.findOne({ description: 'database test' })
-            expect(retrievedPayment.contractId.toString()).to.equal(paymentData.contractId)
-            expect(retrievedPayment.description).to.equal(paymentData.description)
-            expect(retrievedPayment.value).to.equal(paymentData.value)
-            expect(retrievedPayment.time).to.deep.equal(paymentData.time)
+            expect(retrievedPayment.contractId.toString()).to.equal(paymentData.single.contractId)
+            expect(retrievedPayment.description).to.equal(paymentData.single.description)
+            expect(retrievedPayment.value).to.equal(paymentData.single.value)
+            expect(retrievedPayment.time).to.deep.equal(paymentData.single.time)
             expect(retrievedPayment.isImported).to.equal(false)
             expect(retrievedPayment.isDeleted).to.equal(false)
         })
@@ -29,7 +29,7 @@ describe('Test payment db service', function() {
         let paymentForDeleteTest
 
         before('Create dummy data entity', async function() {
-            paymentForDeleteTest = await Payment.create(paymentData)
+            paymentForDeleteTest = await Payment.create(paymentData.single)
         })
 
         it('Should mark payment as \'deleted\'', async function() {
@@ -44,7 +44,7 @@ describe('Test payment db service', function() {
         let paymentForUpdateTest
 
         before('Create dummy data entity', async function() {
-            paymentForUpdateTest = await Payment.create(paymentData)
+            paymentForUpdateTest = await Payment.create(paymentData.single)
         })
 
         it('Should update payment', async function() {
@@ -53,6 +53,28 @@ describe('Test payment db service', function() {
             let retrievedPayment = await Payment.findById(paymentForUpdateTest.id)
             expect(retrievedPayment.value).to.equal(999)
             expect(retrievedPayment.isImported).to.equal(true)
+        })
+    })
+
+    describe('Get array of payments that fulfil \'contractId\', \'startDate\', \'endDate\' criteria', function() {
+        before('Create dummy data entities', async function() {
+            await Payment.insertMany(paymentData.multiple)
+        })
+
+        it('Should fetch array of payments that fulfils contractId, startDate and endDate criteria', async function() {
+            let paymentResultArr = await paymentDbService.getPaymentsWithFilter({
+                contractId: paymentData.multiple[0].contractId,
+                startDate: '2018-02-16',
+                endDate: '2018-06-30'
+            })
+            expect(paymentResultArr.length).to.equal(3)
+
+            paymentResultArr = await paymentDbService.getPaymentsWithFilter({
+                contractId: paymentData.multiple[0].contractId,
+                startDate: '2018-02-01',
+                endDate: '2018-02-28'
+            })
+            expect(paymentResultArr.length).to.equal(2)
         })
     })
 
