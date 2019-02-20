@@ -27,6 +27,12 @@ contractSchema.set('toObject', {
     transform: function(doc, ret) { delete ret._id }
 })
 
+contractSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function(doc, ret) { delete ret._id }
+})
+
 const Contract = mongoose.model('Contract', contractSchema)
 
 module.exports = Contract

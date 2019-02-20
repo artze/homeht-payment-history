@@ -40,6 +40,12 @@ paymentSchema.set('toObject', {
     transform: function(doc, ret) { delete ret._id }
 })
 
+paymentSchema.set('toJSON', {
+    virtuals: true,
+    versionKey: false,
+    transform: function(doc, ret) { delete ret._id }
+})
+
 const Payment = mongoose.model('Payment', paymentSchema)
 
 module.exports = Payment
