@@ -40,6 +40,22 @@ describe('Test payment db service', function() {
         })
     })
 
+    describe('Update payment', function() {
+        let paymentForUpdateTest
+
+        before('Create dummy data entity', async function() {
+            paymentForUpdateTest = await Payment.create(paymentData)
+        })
+
+        it('Should update payment', async function() {
+            await paymentDbService.updatePayment(paymentForUpdateTest.id, { value: 999, isImported: true })
+
+            let retrievedPayment = await Payment.findById(paymentForUpdateTest.id)
+            expect(retrievedPayment.value).to.equal(999)
+            expect(retrievedPayment.isImported).to.equal(true)
+        })
+    })
+
     after('Close DB connection', async function() {
         await Payment.deleteMany({ description: 'database test' })
         db.disconnect()
