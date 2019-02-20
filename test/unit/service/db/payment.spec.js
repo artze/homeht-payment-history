@@ -78,7 +78,7 @@ describe('Test payment db service', function() {
         })
     })
 
-    after('Close DB connection', async function() {
+    after('Delete dummy data and close DB connection', async function() {
         await Payment.deleteMany({ description: 'database test' })
         db.disconnect()
     })
