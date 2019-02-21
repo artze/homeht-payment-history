@@ -1,3 +1,4 @@
+const mongoose = require('mongoose')
 const Payment = require('../../db/models/Payment')
 const ResourceNotFoundError = require('../../errors/ResourceNotFoundError')
 
@@ -61,6 +62,9 @@ function deletePayment(paymentId) {
                 resolve()
             })
             .catch(function(err) {
+                if(err instanceof mongoose.Error.CastError) {
+                    reject(new ResourceNotFoundError('Payment id is incorrect'))
+                }
                 reject(err)
             })
     })
@@ -82,6 +86,9 @@ function updatePayment(paymentId, updatedPayment) {
                 resolve()
             })
             .catch(function(err) {
+                if(err instanceof mongoose.Error.CastError) {
+                    reject(new ResourceNotFoundError('Payment id is incorrect'))
+                }
                 reject(err)
             })
     })
