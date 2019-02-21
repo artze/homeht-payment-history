@@ -31,6 +31,7 @@ describe('Test payments API endpoints', function() {
             const response = await request({
                 method: 'GET',
                 url: `${domainUrl}/contracts/${contractDbObj.id}/payments?${queryString}`,
+                json: true,
                 resolveWithFullResponse: true
             })
             expect(response.statusCode).to.equal(200)
@@ -40,10 +41,10 @@ describe('Test payments API endpoints', function() {
             const response = await request({
                 method: 'GET',
                 url: `${domainUrl}/contracts/${contractDbObj.id}/payments?${queryString}`,
+                json: true,
                 resolveWithFullResponse: true
             })
-            const parsedResponseBody = JSON.parse(response.body)
-            expect(parsedResponseBody.length).to.equal(2)
+            expect(response.body.length).to.equal(2)
         })
     })
 
