@@ -43,7 +43,7 @@ describe('Test validation module', function() {
         })
     })
     
-    describe('Validate inputs for getPayments request', function() {
+    describe('Validate input for getPayments request', function() {
         it('Should not throw an error with correct input', function() {
             const req = {
                 query: {
@@ -83,6 +83,48 @@ describe('Test validation module', function() {
                 validate.getPaymentsInput(req)
             })
                 .to.throw(InvalidInputError, validate.errorMessages.missingDateFieldsError)
+        })
+    })
+
+    describe('Validate input for updatePayment request', function() {
+        it('Should not throw error with correct input', function() {
+            const req = {
+                body: {
+                    description: 'a string',
+                    value: 333,
+                    time: new Date('2019-01-01').toISOString(),
+                    isImported: true
+                }
+            }
+            expect(function() {
+                validate.updatePaymentInput(req)
+            })
+                .to.not.throw()
+        })
+
+        it('Should throw InvalidInputError when forbidden fields are included', function() {
+            const req = {
+                body: {
+                    contractId: '9a80785d802b546104b987c3',
+                    description: 'a string',
+                }
+            }
+            expect(function() {
+                validate.updatePaymentInput(req)
+            })
+                .to.throw(InvalidInputError, validate.errorMessages.forbiddenUpdateFields)
+        })
+
+        it('Should throw InvalidInputError when input contains incorrect data types', function() {
+            const req = {
+                body: {
+                    value: '300'
+                }
+            }
+            expect(function() {
+                validate.updatePaymentInput(req)
+            })
+                .to.throw(InvalidInputError, validate.errorMessages.invalidDataTypes)
         })
     })
 })
