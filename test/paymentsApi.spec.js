@@ -100,16 +100,24 @@ describe('Test payments API endpoints', function() {
         })
     })
     
-    // describe('Calling DELETE to /payments/:paymentId', function() {
-    //     it('Should return 200 response', function(done) {
-    //         request.delete({
-    //             url: `${paymentApiUrl}/1`
-    //         }, function(err, res) {
-    //             expect(res.statusCode).to.equal(200)
-    //             done()
-    //         })
-    //     })
-    // })
+    describe('Delete payment entity with DELETE', function() {
+        let targetPaymentId
+        it('Should return 200 response', async function() {
+            targetPaymentId = paymentDbObjArr[1].id
+            const response = await request({
+                method: 'DELETE',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments/${targetPaymentId}`,
+                resolveWithFullResponse: true,
+                json: true
+            })
+            expect(response.statusCode).to.equal(200)
+        })
+
+        it('Should mark payment entity as \'deleted\'', async function() {
+            const retrievedPayment = await Payment.findById(targetPaymentId)
+            expect(retrievedPayment.isDeleted).to.equal(true)
+        })
+    })
 
     after('Delete dummy data and close DB connection', async function() {
         await Contract.deleteMany({ propertyAddress: 'database test' })

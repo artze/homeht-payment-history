@@ -43,8 +43,14 @@ function updatePayment(req, res, next) {
         })
 }
 
-function deletePayment(req, res) {
-    res.status(200).end()
+function deletePayment(req, res, next) {
+    paymentDbService.deletePayment(req.params.paymentId)
+        .then(function() {
+            res.status(200).end()
+        })
+        .catch(function(err) {
+            return next(err)
+        })
 }
 
 module.exports = {
