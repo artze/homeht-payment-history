@@ -29,6 +29,7 @@ describe('Test payments API endpoints', function() {
         const queryString = 'startDate=2018-02-01&endDate=2018-02-28'
         it('Should return response code 200', async function() {
             const response = await request({
+                method: 'GET',
                 url: `${domainUrl}/contracts/${contractDbObj.id}/payments?${queryString}`,
                 resolveWithFullResponse: true
             })
@@ -37,6 +38,7 @@ describe('Test payments API endpoints', function() {
 
         it('Should return correct list of payments', async function() {
             const response = await request({
+                method: 'GET',
                 url: `${domainUrl}/contracts/${contractDbObj.id}/payments?${queryString}`,
                 resolveWithFullResponse: true
             })
@@ -45,18 +47,31 @@ describe('Test payments API endpoints', function() {
         })
     })
 
-    // describe('Create payment entity with POST', function() {
-    //     it('Should return 201 response', function(done) {
-    //         request.post({
-    //             url: `${domainUrl}/contracts/${contractDbObj.id}/payments`,
-    //             json: true,
-    //             body: paymentData.single
-    //         }, function(err, res) {
-    //             expect(res.statusCode).to.equal(201)
-    //             done()
-    //         })
-    //     })
-    // })
+    describe('Create payment entity with POST', function() {
+        it('Should return 201 response', async function() {
+            const response = await request({
+                method: 'POST',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments`,
+                resolveWithFullResponse: true,
+                json: true,
+                body: paymentData.single
+            })
+            expect(response.statusCode).to.equal(201)
+        })
+
+        it('Should create payment entity in database', async function() {
+            const response = await request({
+                method: 'POST',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments`,
+                resolveWithFullResponse: true,
+                json: true,
+                body: paymentData.single
+            })
+            const retrievedPayment = await Payment.findById(response.body.id)
+            expect(retrievedPayment.description).to.equal('database test')
+            expect(retrievedPayment.contractId.toString()).to.equal(contractDbObj.id)
+        })
+    })
 
     // describe('Calling PATCH to /payments/:paymentId', function() {
     //     it('Should return 200 response', function(done) {

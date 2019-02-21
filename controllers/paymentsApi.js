@@ -16,8 +16,20 @@ function getPayments(req, res, next) {
         })
 }
 
-function createPayment(req, res) {
-    res.status(201).end()
+function createPayment(req, res, next) {
+    const payment = {
+        contractId: req.params.contractId,
+        description: req.body.description,
+        value: req.body.value,
+        time: new Date(req.body.time)
+    }
+    paymentDbService.createPayment(payment)
+        .then(function(createdPayment) {
+            res.status(201).json(createdPayment)
+        })
+        .catch(function(err) {
+            return next(err)
+        })
 }
 
 function updatePayment(req, res) {
