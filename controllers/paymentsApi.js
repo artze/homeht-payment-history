@@ -32,8 +32,15 @@ function createPayment(req, res, next) {
         })
 }
 
-function updatePayment(req, res) {
-    res.status(200).end()
+function updatePayment(req, res, next) {
+    const newPaymentValues = req.body
+    paymentDbService.updatePayment(req.params.paymentId, newPaymentValues)
+        .then(function() {
+            res.status(200).end()
+        })
+        .catch(function(err) {
+            return next(err)
+        })
 }
 
 function deletePayment(req, res) {

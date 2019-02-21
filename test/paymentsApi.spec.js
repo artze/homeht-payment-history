@@ -74,16 +74,31 @@ describe('Test payments API endpoints', function() {
         })
     })
 
-    // describe('Calling PATCH to /payments/:paymentId', function() {
-    //     it('Should return 200 response', function(done) {
-    //         request.patch({
-    //             url: `${paymentApiUrl}/1`
-    //         }, function(err, res) {
-    //             expect(res.statusCode).to.equal(200)
-    //             done()
-    //         })
-    //     })
-    // })
+    describe('Update payment entity with PATCH', function() {
+        let targetPaymentId
+        const newPaymentValues = {
+            value: 98765,
+            time: new Date('2000-01-01')
+        }
+
+        it('Should return 200 response', async function() {
+            targetPaymentId = paymentDbObjArr[0].id
+            const response = await request({
+                method: 'PATCH',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments/${targetPaymentId}`,
+                resolveWithFullResponse: true,
+                json: true,
+                body: newPaymentValues
+            })
+            expect(response.statusCode).to.equal(200)
+        })
+
+        it('Should update payment entity', async function() {
+            const retrievedPayment = await Payment.findById(targetPaymentId)
+            expect(retrievedPayment.value).to.equal(newPaymentValues.value)
+            expect(retrievedPayment.time).to.deep.equal(newPaymentValues.time)
+        })
+    })
     
     // describe('Calling DELETE to /payments/:paymentId', function() {
     //     it('Should return 200 response', function(done) {
