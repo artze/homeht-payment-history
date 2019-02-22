@@ -2,7 +2,6 @@ const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
 const InvalidInputError = require('../../../errors/InvalidInputError')
 const ResourceNotFoundError = require('../../../errors/ResourceNotFoundError')
-const db = require('../../../db')
 const Contract = require('../../../db/models/Contract')
 const contractData = require('../../fixtures/contractData')
 const validate = require('../../../lib/validate')
@@ -15,7 +14,6 @@ describe('Test validation module', function() {
     let contractDbObj
 
     before('Create dummy data entity', async function() {
-        await db.init()
         contractDbObj= await Contract.create(contractData.single)
     })
 
@@ -203,6 +201,5 @@ describe('Test validation module', function() {
 
     after('Delete dummy data and close DB connection', async function() {
         await Contract.deleteMany({ propertyAddress: 'database test' })
-        db.disconnect()
     })
 })

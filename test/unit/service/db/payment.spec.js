@@ -1,16 +1,11 @@
 const path = require('path')
 require('dotenv').config({ path: path.join(__dirname, '..', '..', '..', '..', '.env') })
 const expect = require('chai').expect
-const db = require('../../../../db')
 const paymentDbService = require('../../../../services/db/payment')
 const Payment = require('../../../../db/models/Payment')
 const paymentData = require('../../../fixtures/paymentData')
 
 describe('Test payment db service', function() {
-    before('Establish DB connection', async function() {
-        await db.init()
-    })
-
     describe('Create payment', function() {
         it('Should create payment entity in db', async function() {
             await paymentDbService.createPayment(paymentData.single)
@@ -80,6 +75,5 @@ describe('Test payment db service', function() {
 
     after('Delete dummy data and close DB connection', async function() {
         await Payment.deleteMany({ description: 'database test' })
-        db.disconnect()
     })
 })
