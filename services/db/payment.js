@@ -95,7 +95,7 @@ function updatePayment(paymentId, updatedPayment) {
 }
 
 /**
- * Fetches payment entities from database that fulfils contractId, startDate, endDate
+ * Fetches payment entities from database that fulfils contractId, startDate, endDate and have not been deleted
  * @param {PaymentFilterObject} filter - Determines payment fetching conditions
  * @returns {Promise}
  */
@@ -105,7 +105,8 @@ function getPaymentsWithFilter(filter) {
         time: {
             $gte: new Date(filter.startDate),
             $lte: new Date(filter.endDate)
-        }
+        },
+        isDeleted: false
     }
     return new Promise(function(resolve, reject) {
         Payment.find(conditions)
