@@ -7,13 +7,15 @@ const domainUrl = require('./config').domainUrl
 const paymentData = require('./fixtures/paymentData')
 const contractData = require('./fixtures/contractData')
 
+before('Create DB connection', async function() {
+    await db.init()
+})
+
 describe('Test payments API endpoints', function() {
     let contractDbObj
     let paymentDbObjArr
 
     before('Create Contract and Payment dummy data', async function() {
-        db.init()
-
         contractDbObj = await Contract.create(contractData.single)
         
         const paymentDataArrWithUpdatedContractId = paymentData.multiple.map(function(payment) {
@@ -119,9 +121,12 @@ describe('Test payments API endpoints', function() {
         })
     })
 
-    after('Delete dummy data and close DB connection', async function() {
+    after('Delete dummy data', async function() {
         await Contract.deleteMany({ propertyAddress: 'database test' })
         await Payment.deleteMany({ description: 'database test' })
-        db.disconnect()
     })
+})
+
+after('Close DB connection', function() {
+    db.disconnect()
 })

@@ -1,4 +1,6 @@
+const mongoose = require('mongoose')
 const Payment = require('../../db/models/Payment')
+const ResourceNotFoundError = require('../../errors/ResourceNotFoundError')
 
 /**
  * Custom object definitions
@@ -53,10 +55,16 @@ function deletePayment(paymentId) {
         Payment.findByIdAndUpdate(paymentId, {
             isDeleted: true
         })
-            .then(function() {
+            .then(function(foundPaymentObject) {
+                if(foundPaymentObject === null) {
+                    throw new ResourceNotFoundError('Payment resource not found')
+                }
                 resolve()
             })
             .catch(function(err) {
+                if(err instanceof mongoose.Error.CastError) {
+                    reject(new ResourceNotFoundError('Payment id is incorrect'))
+                }
                 reject(err)
             })
     })
@@ -71,10 +79,16 @@ function deletePayment(paymentId) {
 function updatePayment(paymentId, updatedPayment) {
     return new Promise(function(resolve, reject) {
         Payment.findByIdAndUpdate(paymentId, updatedPayment)
-            .then(function() {
+            .then(function(foundPaymentObject) {
+                if(foundPaymentObject === null) {
+                    throw new ResourceNotFoundError('Payment resource not found')
+                }
                 resolve()
             })
             .catch(function(err) {
+                if(err instanceof mongoose.Error.CastError) {
+                    reject(new ResourceNotFoundError('Payment id is incorrect'))
+                }
                 reject(err)
             })
     })
