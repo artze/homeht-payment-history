@@ -12,6 +12,13 @@ chai.use(chaiAsPromised)
 const expect = chai.expect
 
 describe('Test validation module', function() {
+    let contractDbObj
+
+    before('Create dummy data entity', async function() {
+        await db.init()
+        contractDbObj= await Contract.create(contractData.single)
+    })
+
     describe('Validate start and end dates', function() {
         it('Should not throw an error with correct dates', function() {
             expect(function() {
@@ -53,11 +60,6 @@ describe('Test validation module', function() {
     })
 
     describe('Validate presence of contractId', function() {
-        let contractDbObj
-        before('Create dummy data entity', async function() {
-            await db.init()
-            contractDbObj= await Contract.create(contractData.single)
-        })
 
         it('Should not throw error if contact id exists', function() {
             return expect(validate.existenceOfContractId(contractDbObj.id)).to.be.fulfilled
@@ -67,9 +69,50 @@ describe('Test validation module', function() {
             return expect(validate.existenceOfContractId('dddd')).to.be.rejectedWith(ResourceNotFoundError)
         })
 
-        after('Delete dummy data and close DB connection', async function() {
-            await Contract.deleteMany({ propertyAddress: 'database test' })
-            db.disconnect()
+
+    })
+
+    describe('Validate input for createPayment request', function() {
+        it('Should not throw an error with correct input', function() {
+            const req = {
+                params: {
+                    contractId: contractDbObj.id
+                },
+                body: {
+                    description: 'a string',
+                    value: 333,
+                    time: new Date('2019-01-01').toISOString(),
+                }
+            }
+            return expect(validate.createPaymentInput(req)).to.be.fulfilled
+        })
+
+        it('Should throw InvalidInputError when input contains incorrect data types', function() {
+            const req = {
+                params: {
+                    contractId: contractDbObj.id
+                },
+                body: {
+                    description: 'a string',
+                    value: '333',
+                    time: new Date('2019-01-01').toISOString(),
+                }
+            }
+            return expect(validate.createPaymentInput(req)).to.be.rejectedWith(InvalidInputError, validate.errorMessages.invalidDataTypes)
+        })
+
+        it('Should throw ResourceNotFoundError when input contains non-existent contractId', function() {
+            const req = {
+                params: {
+                    contractId: '1234abcde'
+                },
+                body: {
+                    description: 'a string',
+                    value: 333,
+                    time: new Date('2019-01-01').toISOString(),
+                }
+            }
+            return expect(validate.createPaymentInput(req)).to.be.rejectedWith(ResourceNotFoundError)
         })
     })
     
@@ -156,5 +199,10 @@ describe('Test validation module', function() {
             })
                 .to.throw(InvalidInputError, validate.errorMessages.invalidDataTypes)
         })
+    })
+
+    after('Delete dummy data and close DB connection', async function() {
+        await Contract.deleteMany({ propertyAddress: 'database test' })
+        db.disconnect()
     })
 })
