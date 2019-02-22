@@ -47,7 +47,7 @@ describe('Test payments API endpoints', function() {
                 json: true,
                 resolveWithFullResponse: true
             })
-            expect(response.body.length).to.equal(2)
+            expect(response.body.items.length).to.equal(2)
         })
     })
 

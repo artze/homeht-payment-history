@@ -1,5 +1,6 @@
 // @ts-check
 const paymentDbService = require('../services/db/payment')
+const paymentSummary = require('../lib/paymentSummary')
 const validate = require('../lib/validate')
 
 function getPayments(req, res, next) {
@@ -16,7 +17,8 @@ function getPayments(req, res, next) {
     }
     paymentDbService.getPaymentsWithFilter(filter)
         .then(function(fetchedPayments) {
-            res.status(200).json(fetchedPayments)
+            const formattedPayments = paymentSummary.transform(fetchedPayments)
+            res.status(200).json(formattedPayments)
         })
         .catch(function(err) {
             return next(err)
