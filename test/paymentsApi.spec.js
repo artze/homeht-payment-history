@@ -29,6 +29,7 @@ describe('Test payments API endpoints', function() {
 
     describe('Fetch payments with filters in query string with GET', function() {
         const queryString = 'startDate=2018-02-01&endDate=2018-02-28'
+
         it('Should return response code 200', async function() {
             const response = await request({
                 method: 'GET',
@@ -50,14 +51,47 @@ describe('Test payments API endpoints', function() {
         })
     })
 
+    describe('Fetch payments using incorrect query string with GET', function() {
+        const queryString = 'startDate=2018-02-01&endDate=20181212'
+
+        it('Should return response code 400', async function() {
+            const response = await request({
+                method: 'GET',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments?${queryString}`,
+                json: true,
+                resolveWithFullResponse: true,
+                simple: false
+            })
+            expect(response.statusCode).to.equal(400)
+        })
+    })
+
+    describe('Fetch payments using invalid contractId with GET', function() {
+        const queryString = 'startDate=2018-02-01&endDate=2018-02-28'
+        
+        it('Should return response code 404', async function() {
+            const response = await request({
+                method: 'GET',
+                url: `${domainUrl}/contracts/12345/payments?${queryString}`,
+                json: true,
+                resolveWithFullResponse: true,
+                simple: false
+            })
+            expect(response.statusCode).to.equal(404)
+        })
+    })
+
     describe('Create payment entity with POST', function() {
-        it('Should return 201 response', async function() {
+        const paymentDataForCreation = Object.assign({}, paymentData.single)
+        delete paymentDataForCreation.contractId
+
+        it('Should return response code 201', async function() {
             const response = await request({
                 method: 'POST',
                 url: `${domainUrl}/contracts/${contractDbObj.id}/payments`,
                 resolveWithFullResponse: true,
                 json: true,
-                body: paymentData.single
+                body: paymentDataForCreation
             })
             expect(response.statusCode).to.equal(201)
         })
@@ -68,7 +102,7 @@ describe('Test payments API endpoints', function() {
                 url: `${domainUrl}/contracts/${contractDbObj.id}/payments`,
                 resolveWithFullResponse: true,
                 json: true,
-                body: paymentData.single
+                body: paymentDataForCreation
             })
             const retrievedPayment = await Payment.findById(response.body.id)
             expect(retrievedPayment.description).to.equal('database test')
@@ -76,14 +110,49 @@ describe('Test payments API endpoints', function() {
         })
     })
 
+    describe('Create payment entity using invalid data types with POST', function() {
+        const paymentDataForCreation = Object.assign({}, paymentData.single)
+        delete paymentDataForCreation.contractId
+        paymentDataForCreation.value = '300'
+
+        it('Should return response code 400', async function() {
+            const response = await request({
+                method: 'POST',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments`,
+                resolveWithFullResponse: true,
+                json: true,
+                body: paymentDataForCreation,
+                simple: false
+            })
+            expect(response.statusCode).to.equal(400)
+        })
+    })
+
+    describe('Create payment entity using invalid contractId with POST', function() {
+        const paymentDataForCreation = Object.assign({}, paymentData.single)
+        delete paymentDataForCreation.contractId
+
+        it('Should return response code 404', async function() {
+            const response = await request({
+                method: 'POST',
+                url: `${domainUrl}/contracts/12345/payments`,
+                resolveWithFullResponse: true,
+                json: true,
+                body: paymentDataForCreation,
+                simple: false
+            })
+            expect(response.statusCode).to.equal(404)
+        })
+    })
+
     describe('Update payment entity with PATCH', function() {
         let targetPaymentId
         const newPaymentValues = {
             value: 98765,
-            time: new Date('2000-01-01')
+            time: new Date('2000-01-01').toISOString()
         }
 
-        it('Should return 200 response', async function() {
+        it('Should return response code 200', async function() {
             targetPaymentId = paymentDbObjArr[0].id
             const response = await request({
                 method: 'PATCH',
@@ -98,7 +167,48 @@ describe('Test payments API endpoints', function() {
         it('Should update payment entity', async function() {
             const retrievedPayment = await Payment.findById(targetPaymentId)
             expect(retrievedPayment.value).to.equal(newPaymentValues.value)
-            expect(retrievedPayment.time).to.deep.equal(newPaymentValues.time)
+            expect(retrievedPayment.time.toISOString()).to.equal(newPaymentValues.time)
+        })
+    })
+
+    describe('Update payment entity using invalid data types with PATCH', function() {
+        let targetPaymentId
+        const newPaymentValues = {
+            value: '98765',
+        }
+
+        it('Should return response code 400', async function() {
+            targetPaymentId = paymentDbObjArr[1].id
+            const response = await request({
+                method: 'PATCH',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments/${targetPaymentId}`,
+                resolveWithFullResponse: true,
+                json: true,
+                body: newPaymentValues,
+                simple: false
+            })
+            expect(response.statusCode).to.equal(400)
+        })
+    })
+
+    describe('Update payment entity using forbidden fields with PATCH', function() {
+        let targetPaymentId
+        const newPaymentValues = {
+            contractId: '12345',
+            value: '98765',
+        }
+
+        it('Should return response code 400', async function() {
+            targetPaymentId = paymentDbObjArr[2].id
+            const response = await request({
+                method: 'PATCH',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments/${targetPaymentId}`,
+                resolveWithFullResponse: true,
+                json: true,
+                body: newPaymentValues,
+                simple: false
+            })
+            expect(response.statusCode).to.equal(400)
         })
     })
     
