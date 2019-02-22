@@ -1,6 +1,15 @@
-const expect = require('chai').expect
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
 const InvalidInputError = require('../../../errors/InvalidInputError')
+const ResourceNotFoundError = require('../../../errors/ResourceNotFoundError')
+const db = require('../../../db')
+const Contract = require('../../../db/models/Contract')
+const contractData = require('../../fixtures/contractData')
 const validate = require('../../../lib/validate')
+
+chai.use(chaiAsPromised)
+
+const expect = chai.expect
 
 describe('Test validation module', function() {
     describe('Validate start and end dates', function() {
@@ -40,6 +49,27 @@ describe('Test validation module', function() {
                 validate.startEndDates('2018-01-02', '2018-01-01')
             })
                 .to.throw(InvalidInputError, validate.errorMessages.dateOrderError)
+        })
+    })
+
+    describe('Validate presence of contractId', function() {
+        let contractDbObj
+        before('Create dummy data entity', async function() {
+            await db.init()
+            contractDbObj= await Contract.create(contractData.single)
+        })
+
+        it('Should not throw error if contact id exists', function() {
+            return expect(validate.existenceOfContractId(contractDbObj.id)).to.be.fulfilled
+        })
+
+        it('Should throw ResourceNotFoundError if contract id is not found', function() {
+            return expect(validate.existenceOfContractId('dddd')).to.be.rejectedWith(ResourceNotFoundError)
+        })
+
+        after('Delete dummy data and close DB connection', async function() {
+            await Contract.deleteMany({ propertyAddress: 'database test' })
+            db.disconnect()
         })
     })
     
