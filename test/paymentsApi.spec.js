@@ -49,6 +49,18 @@ describe('Test payments API endpoints', function() {
             })
             expect(response.body.items.length).to.equal(2)
         })
+
+        it('Should return list of payments with correct fields', async function() {
+            const response = await request({
+                method: 'GET',
+                url: `${domainUrl}/contracts/${contractDbObj.id}/payments?${queryString}`,
+                json: true,
+                resolveWithFullResponse: true
+            })
+            const correctFields = ['id', 'contractId', 'description', 'value', 'time', 'isImported', 'createdAt', 'updatedAt', 'isDeleted']
+            const resultFields = Object.keys(response.body.items[0])
+            expect(resultFields).to.have.members(correctFields)
+        })
     })
 
     describe('Fetch payments using incorrect query string with GET', function() {
