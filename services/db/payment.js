@@ -113,6 +113,9 @@ function getPaymentsWithFilter(filter) {
                 resolve(fetchedPayments)
             })
             .catch(function(err) {
+                if(err instanceof mongoose.Error.CastError) {
+                    reject(new ResourceNotFoundError('Payment id is incorrect'))
+                }
                 reject(err)
             })
     })

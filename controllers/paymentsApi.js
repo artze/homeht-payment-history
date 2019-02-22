@@ -1,7 +1,14 @@
 // @ts-check
 const paymentDbService = require('../services/db/payment')
+const validate = require('../lib/validate')
 
 function getPayments(req, res, next) {
+    try {
+        validate.getPaymentsInput(req)
+    } catch(err) {
+        return next(err)
+    }
+
     const filter = {
         contractId: req.params.contractId,
         startDate: req.query.startDate,
@@ -17,13 +24,16 @@ function getPayments(req, res, next) {
 }
 
 function createPayment(req, res, next) {
-    const payment = {
-        contractId: req.params.contractId,
-        description: req.body.description,
-        value: req.body.value,
-        time: new Date(req.body.time)
-    }
-    paymentDbService.createPayment(payment)
+    validate.createPaymentInput(req)
+        .then(function() {
+            const payment = {
+                contractId: req.params.contractId,
+                description: req.body.description,
+                value: req.body.value,
+                time: new Date(req.body.time)
+            }
+            return paymentDbService.createPayment(payment)
+        })
         .then(function(createdPayment) {
             res.status(201).json(createdPayment)
         })
@@ -33,6 +43,12 @@ function createPayment(req, res, next) {
 }
 
 function updatePayment(req, res, next) {
+    try {
+        validate.updatePaymentInput(req)
+    } catch(err) {
+        return next(err)
+    }
+
     const newPaymentValues = req.body
     paymentDbService.updatePayment(req.params.paymentId, newPaymentValues)
         .then(function() {

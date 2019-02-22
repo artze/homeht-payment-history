@@ -14,7 +14,7 @@ describe('Test payment db service', function() {
             expect(retrievedPayment.contractId.toString()).to.equal(paymentData.single.contractId)
             expect(retrievedPayment.description).to.equal(paymentData.single.description)
             expect(retrievedPayment.value).to.equal(paymentData.single.value)
-            expect(retrievedPayment.time).to.deep.equal(paymentData.single.time)
+            expect(retrievedPayment.time.toISOString()).to.equal(paymentData.single.time)
             expect(retrievedPayment.isImported).to.equal(false)
             expect(retrievedPayment.isDeleted).to.equal(false)
         })
